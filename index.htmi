@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Crypto SMC Signals</title>
+
+<meta name="theme-color" content="#0d1117">
+
+<meta name="description"
+content="Professional Crypto Futures Signals">
+
+<link rel="manifest" href="manifest.json">
+
+<link rel="icon" href="icons/icon-192.png">
+
+<link rel="apple-touch-icon"
+href="icons/icon-192.png">
+
+<link rel="stylesheet"
+href="style.css">
+
+<script
+src="https://cdn.jsdelivr.net/npm/lightweight-charts/dist/lightweight-charts.standalone.production.js">
+</script>
+
+</head>
+
+<body>
+
+<div id="app">
+
+<header>
+
+<div class="logo">
+
+<h1>
+Crypto SMC Signals
+</h1>
+
+<p>
+
+Order Block + ADX Strategy
+
+</p>
+
+</div>
+
+<div class="headerButtons">
+
+<button id="installBtn">
+
+📲 تثبيت التطبيق
+
+</button>
+
+<button id="notificationBtn">
+
+🔔 التنبيهات
+
+</button>
+
+</div>
+
+</header>
+
+<section class="marketStatus">
+
+<div>
+
+<span>
+
+حالة السوق
+
+</span>
+
+<strong id="marketState">
+
+Scanning...
+
+</strong>
+
+</div>
+
+<div>
+
+<span>
+
+آخر تحديث
+
+</span>
+
+<strong id="lastUpdate">
+
+--
+
+</strong>
+
+</div>
+
+</section>
+
+<section class="coinList">
+
+<h2>
+
+العملات
+
+</h2>
+
+<div id="coins">
+
+</div>
+
+</section>
+
+<section class="chartSection">
+
+<h2>
+
+الرسم البياني
+
+</h2>
+
+<div id="chart">
+
+</div>
+
+</section>
+
+<section class="signals">
+
+<h2>
+
+الإشارات المباشرة
+
+</h2>
+
+<div id="signalContainer">
+
+</div>
+
+</section>
+
+<section class="history">
+
+<h2>
+
+سجل الإشارات
+
+</h2>
+
+<div id="historyContainer">
+
+</div>
+
+</section>
+
+<section class="statistics">
+
+<h2>
+
+الإحصائيات
+
+</h2>
+
+<div class="statsGrid">
+
+<div class="card">
+
+<h3>
+
+إجمالي الإشارات
+
+</h3>
+
+<p id="totalSignals">
+
+0
+
+</p>
+
+</div>
+
+<div class="card">
+
+<h3>
+
+الصفقات الرابحة
+
+</h3>
+
+<p id="wins">
+
+0
+
+</p>
+
+</div>
+
+<div class="card">
+
+<h3>
+
+الصفقات الخاسرة
+
+</h3>
+
+<p id="losses">
+
+0
+
+</p>
+
+</div>
+
+<div class="card">
+
+<h3>
+
+نسبة النجاح
+
+</h3>
+
+<p id="accuracy">
+
+0%
+
+</p>
+
+</div>
+
+</div>
+
+</section>
+
+<footer>
+
+<p>
+
+Crypto SMC Signals
+Version 1.0
+
+</p>
+
+</footer>
+
+</div>
+
+<script src="app.js"></script>
+
+</body>
+
+</html>
