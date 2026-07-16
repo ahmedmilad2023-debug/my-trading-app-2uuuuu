@@ -829,3 +829,553 @@ class SignalEngine {
 
 const signalEngine =
 new SignalEngine();
+// ===============================
+// Market Scanner
+// ===============================
+
+
+class MarketScanner {
+
+
+    constructor(){
+
+
+        this.running = false;
+
+
+    }
+
+
+
+    async scanSymbol(symbol){
+
+
+        let candles =
+
+        await binance.getCandles(symbol);
+
+
+
+        if(candles.length === 0){
+
+            return null;
+
+        }
+
+
+
+        let signal =
+
+        signalEngine.analyze(
+            symbol,
+            candles
+        );
+
+
+
+        if(signal){
+
+
+            this.handleSignal(signal);
+
+
+        }
+
+
+        return signal;
+
+
+    }
+
+
+
+
+
+    async scanAll(){
+
+
+
+        for(
+            let symbol of CONFIG.symbols
+        ){
+
+
+            await this.scanSymbol(symbol);
+
+
+        }
+
+
+
+        document.getElementById(
+            "lastUpdate"
+        ).innerText =
+
+        new Date()
+        .toLocaleTimeString();
+
+
+    }
+
+
+
+
+
+    start(){
+
+
+        if(this.running)
+        return;
+
+
+
+        this.running = true;
+
+
+
+        this.scanAll();
+
+
+
+        setInterval(()=>{
+
+
+            this.scanAll();
+
+
+        },
+        CONFIG.scanTime
+        );
+
+
+    }
+
+
+
+
+
+    handleSignal(signal){
+
+
+
+        let signalID =
+
+        signal.symbol +
+        signal.type +
+        signal.entry;
+
+
+
+        // منع تكرار نفس الصفقة
+
+        if(
+            lastSignalID === signalID
+        ){
+
+            return;
+
+        }
+
+
+
+        lastSignalID =
+        signalID;
+
+
+
+        signalsHistory.unshift(
+            signal
+        );
+
+
+
+        saveHistory();
+
+
+
+        displaySignal(
+            signal
+        );
+
+
+
+        sendNotification(
+            signal
+        );
+
+
+    }
+
+
+
+}
+
+
+
+const scanner =
+
+new MarketScanner();
+
+
+
+
+
+// ===============================
+// Start Application
+// ===============================
+
+
+window.addEventListener(
+"load",
+()=>{
+
+
+    scanner.start();
+
+
+});
+// ===============================
+// UI Signal Display
+// ===============================
+
+
+function displaySignal(signal){
+
+
+    const container =
+
+    document.getElementById(
+        "signalContainer"
+    );
+
+
+
+    if(!container)
+    return;
+
+
+
+    let typeClass =
+
+    signal.type === "BUY"
+    ?
+    "buy"
+    :
+    "sell";
+
+
+
+    let typeText =
+
+    signal.type === "BUY"
+    ?
+    "🟢 شراء"
+    :
+    "🔴 بيع";
+
+
+
+    container.innerHTML = `
+
+    <div class="signalCard ${typeClass}">
+
+        <div class="signalHeader">
+
+            <h3>
+            ${signal.symbol}
+            </h3>
+
+            <strong>
+            ${typeText}
+            </strong>
+
+        </div>
+
+
+        <div class="signalRow">
+            <span>الدخول</span>
+            <strong class="entry">
+            ${signal.entry.toFixed(4)}
+            </strong>
+        </div>
+
+
+        <div class="signalRow">
+            <span>وقف الخسارة</span>
+            <strong class="stop">
+            ${signal.stopLoss.toFixed(4)}
+            </strong>
+        </div>
+
+
+        <div class="signalRow">
+            <span>الهدف 1</span>
+            <strong class="target">
+            ${signal.target1.toFixed(4)}
+            </strong>
+        </div>
+
+
+        <div class="signalRow">
+            <span>الهدف 2</span>
+            <strong class="target">
+            ${signal.target2.toFixed(4)}
+            </strong>
+        </div>
+
+
+        <div class="signalRow">
+            <span>ADX</span>
+            <strong>
+            ${signal.adx}
+            </strong>
+        </div>
+
+
+        <div class="analysisBox">
+
+            <h4>
+            سبب الدخول
+            </h4>
+
+            <p>
+            ${signal.reason}
+            </p>
+
+        </div>
+
+
+        <div class="signalActions">
+
+            <button
+            onclick="shareSignal('${signal.symbol}')">
+
+            📤 مشاركة
+
+            </button>
+
+
+            <button
+            onclick="enableAlerts()">
+
+            🔔 تنبيه
+
+            </button>
+
+
+        </div>
+
+
+    </div>
+
+    `;
+
+
+}
+
+
+
+
+
+// ===============================
+// Notification System
+// ===============================
+
+
+async function enableAlerts(){
+
+
+    if(
+    "Notification" in window
+    ){
+
+
+        await Notification.requestPermission();
+
+
+    }
+
+
+}
+
+
+
+
+
+function sendNotification(signal){
+
+
+
+    if(
+    Notification.permission !== "granted"
+    )
+    return;
+
+
+
+    let title =
+
+    signal.type === "BUY"
+
+    ?
+    "🟢 صفقة شراء جديدة"
+
+    :
+    "🔴 صفقة بيع جديدة";
+
+
+
+    let body =
+
+`
+${signal.symbol}
+
+Entry:
+${signal.entry}
+
+SL:
+${signal.stopLoss}
+
+TP:
+${signal.target1}
+`;
+
+
+
+    new Notification(
+
+        title,
+
+        {
+
+            body:body,
+
+            icon:
+            "icons/icon-192.png"
+
+        }
+
+    );
+
+
+}
+
+
+
+
+
+// ===============================
+// Share Function
+// ===============================
+
+
+function shareSignal(symbol){
+
+
+
+    let text =
+
+    `Crypto SMC Signal
+
+${symbol}
+
+تابع الإشارة من التطبيق`;
+
+
+
+    if(
+    navigator.share
+    ){
+
+
+        navigator.share({
+
+            title:
+            "Crypto Signal",
+
+            text:text
+
+
+        });
+
+
+    }
+
+    else{
+
+
+        navigator.clipboard.writeText(
+            text
+        );
+
+
+        alert(
+        "تم نسخ الإشارة"
+        );
+
+
+    }
+
+
+}
+
+
+
+
+
+// ===============================
+// Local Storage
+// ===============================
+
+
+function saveHistory(){
+
+
+    localStorage.setItem(
+
+        "signals",
+
+        JSON.stringify(
+            signalsHistory
+        )
+
+    );
+
+
+}
+
+
+
+
+
+function loadHistory(){
+
+
+
+    let data =
+
+    localStorage.getItem(
+        "signals"
+    );
+
+
+
+    if(data){
+
+
+        signalsHistory =
+        JSON.parse(data);
+
+
+    }
+
+
+}
+
+
+
+
+
+// تحميل السجل عند التشغيل
+
+loadHistory();
